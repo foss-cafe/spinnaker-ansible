@@ -1,0 +1,13 @@
+---
+- name: Getting installation script
+  get_url:
+    url: https://raw.githubusercontent.com/spinnaker/halyard/master/install/debian/InstallHalyard.sh
+    dest: /home/ubuntu/InstallHalyard.sh
+
+- name: Running installation script
+  command: "bash /home/ubuntu/InstallHalyard.sh --user ubuntu -y"
+  become: true
+
+- name: Updating halyard
+  command: update-halyard
+  become: true

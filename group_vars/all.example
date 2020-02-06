@@ -1,0 +1,53 @@
+s3_bucket_name: "spinnaker_bucket"
+root_folder: "front50"
+region : "us-west-2"
+access_key: 
+secret_key: 
+enable_docker_reg: "true"
+docker_regs: 
+    one:
+        provider: "aws"
+        name: "example"
+        address: "https://1233433434.dkr.ecr.us-east-1.amazonaws.com"
+    two:
+        provider: "docker"
+        name: "docker-reg"
+        address: "https://index.docker.io"
+        username: "example"
+        password: "p@ssw0rd"
+
+enable_kubernetes: true
+kubernetes:
+    one:
+        name: example
+        providerVersion: "V2"
+        default_docker_reg: "example"
+        context: example
+        configureImagePullSecrets: "true"
+        kubeconfigFile: "/home/ubuntu/.kube/config"
+
+slack:
+    enable: "true"
+    botname: example
+    token: asdf1234
+prometheus:
+    enable: "true"
+oauth2:
+    enable: "true"
+    clientid: asdf
+    clientsecret: 1234
+authz:
+    enable: "true"
+    roleprovidertype: GITHUB
+    accesstoken: asdf
+    organization: asdf1234
+enable_s3_artifacts: "true"
+s3_artifacts:
+    one:
+        name: test1
+        awsaccesskeyid: asdf
+        awssecretaccesskey: asdf1234
+    two:
+        name: test2
+        awsaccesskeyid: asdfa
+        awssecretaccesskey: asdf1234aaa
