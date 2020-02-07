@@ -1,4 +1,4 @@
-# Spinnaker-Ansible
+# Ansible Playbook for Spinnaker
 
 Ansible Playbook for installing and configuring Spinnaker
 
@@ -36,7 +36,8 @@ vagrant init
 
 You can tune your VM configs by updating `Vagrantfile`.
 
-### Run Playbook
+### Install hal
+
 ```bash
 ansible-playbook install_hal.yml
 
@@ -113,3 +114,18 @@ changed: [192.168.33.11]
 PLAY RECAP *********************************************************************************************************************************************************************************************************************
 192.168.33.11              : ok=22   changed=6    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
+
+Once `hal` is installed Run next pipeline to set the configs
+
+```bash
+cp group_vars/all.example group_vars/all
+```
+
+- Update group_vars/all variables file
+  Run next Playbook
+
+```bash
+ansible-playbook hal_config.yml
+```
+
+Once the configs are set you can login to remote server and do `hal deploy apply` as `ubuntu` user

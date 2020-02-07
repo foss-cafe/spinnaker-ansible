@@ -1,0 +1,352 @@
+currentDeployment: default
+deploymentConfigurations:
+- name: default
+  version: {{ HAL_VERSION }}
+  providers:
+    appengine:
+      enabled: false
+      accounts: []
+    aws:
+      enabled: false
+      accounts: []
+      bakeryDefaults:
+        baseImages: []
+      defaultKeyPairTemplate: '{{ SSH_KEYPAIR }}'
+      defaultRegions:
+      - name: us-west-2
+      defaults:
+        iamRole: BaseIAMRole
+    ecs:
+      enabled: false
+      accounts: []
+    azure:
+      enabled: false
+      accounts: []
+      bakeryDefaults:
+        templateFile: azure-linux.json
+        baseImages: []
+    dcos:
+      enabled: false
+      accounts: []
+      clusters: []
+    dockerRegistry:
+      enabled: {{ enable_docker_reg }}
+      accounts:
+  {% for items in docker_regs %}
+      - name: {{ docker_regs[items].name }}
+        requiredGroupMembership: []
+        providerVersion: V1
+        permissions: {}
+        address: {{ docker_regs[items].address }}
+  {% if docker_regs[items].provider == "aws" %}
+        username: AWS
+        passwordCommand: aws --region {{ docker_regs[items].region }} ecr get-authorization-token --output
+          text --query 'authorizationData[].authorizationToken' | base64 -d | sed
+          's/^AWS://'
+  {% else %}
+        username: {{ docker_regs[items].username }}
+        password: {{ docker_regs[items].password }}
+  {% endif %}
+        email: fake.email@spinnaker.io
+        cacheIntervalSeconds: 30
+        clientTimeoutMillis: 60000
+        cacheThreads: 1
+        paginateSize: 100
+        sortTagsByDate: false
+        trackDigests: false
+        insecureRegistry: false
+        repositories: []
+  {% endfor %}
+      primaryAccount: {{ docker_primary_account }}
+    google:
+      enabled: false
+      accounts: []
+      bakeryDefaults:
+        templateFile: gce.json
+        baseImages: []
+        zone: us-central1-f
+        network: default
+        useInternalIp: false
+    huaweicloud:
+      enabled: false
+      accounts: []
+      bakeryDefaults:
+        baseImages: []
+    kubernetes:
+      enabled: {{ enable_kubernetes }}
+      accounts:
+  {% for items in kubernetes %}
+      - name: {{ kubernetes[items].name }}
+        environment: {{ kubernetes[items].environment }}
+        requiredGroupMembership: []
+        providerVersion: {{ kubernetes[items].providerVersion }}
+        permissions: {}
+        dockerRegistries:
+        - accountName: {{ kubernetes[items].default_docker_reg }}
+          namespaces: []
+        context: {{ kubernetes[items].context }}
+        configureImagePullSecrets: {{ kubernetes[items].configureImagePullSecrets }}
+        cacheThreads: 1
+        namespaces: []
+        omitNamespaces: {{ kubernetes[items].omitnamespaces }}
+        kinds: []
+        omitKinds: []
+        customResources: []
+        cachingPolicies: []
+        kubeconfigFile: {{ kubernetes[items].kubeconfigFile }}
+        oAuthScopes: []
+        onlySpinnakerManaged: {{ kubernetes[items].onlyspinnakermanaged }}
+  {% endfor %}
+      primaryAccount: {{ k8s_primary_account }}
+    oracle:
+      enabled: false
+      accounts: []
+      bakeryDefaults:
+        templateFile: oci.json
+        baseImages: []
+    cloudfoundry:
+      enabled: false
+      accounts: []
+  deploymentEnvironment:
+    size: SMALL
+    type: LocalDebian
+    imageVariant: SLIM
+    updateVersions: true
+    consul:
+      enabled: false
+    vault:
+      enabled: false
+    customSizing: {}
+    sidecars: {}
+    initContainers: {}
+    hostAliases: {}
+    affinity: {}
+    tolerations: {}
+    nodeSelectors: {}
+    gitConfig:
+      upstreamUser: spinnaker
+    livenessProbeConfig:
+      enabled: false
+    haServices:
+      clouddriver:
+        enabled: false
+        disableClouddriverRoDeck: false
+      echo:
+        enabled: false
+  persistentStorage:
+    persistentStoreType: s3
+    azs: {}
+    gcs:
+      rootFolder: front50
+    redis: {}
+    s3:
+      bucket: {{ s3_bucket_name}}
+      rootFolder: {{ root_folder }}
+      pathStyleAccess: false
+      {% if access_key and secret_key %}
+      accessKeyId: {{ access_key }}
+      secretAccessKey: {{ secret_key }}
+      {% endif %}
+      serverSideEncryption: AES256
+    oracle: {}
+  features:
+    auth: false
+    fiat: false
+    chaos: false
+    entityTags: false
+    pipelineTemplates: true
+    artifacts: true
+  metricStores:
+    datadog:
+      enabled: false
+      tags: []
+    prometheus:
+      enabled: {{ prometheus["enable"] }}
+      add_source_metalabels: true
+    stackdriver:
+      enabled: false
+    newrelic:
+      enabled: false
+      tags: []
+    period: 30
+    enabled: false
+  notifications:
+    slack:
+      enabled: {{ slack["enable"] }}
+    {% if slack["enable"] == "true" %}
+      botName: {{ slack.botname }}
+      token: {{ slack.token }}
+    {% endif %}
+    twilio:
+      enabled: false
+      baseUrl: https://api.twilio.com/
+    github-status:
+      enabled: false
+  timezone: America/Los_Angeles
+  ci:
+    jenkins:
+      enabled: false
+      masters: []
+    travis:
+      enabled: false
+      masters: []
+    wercker:
+      enabled: false
+      masters: []
+    concourse:
+      enabled: false
+      masters: []
+    gcb:
+      enabled: false
+      accounts: []
+  repository:
+    artifactory:
+      enabled: false
+      searches: []
+  security:
+    apiSecurity:
+      ssl:
+        enabled: false
+      overrideBaseUrl: {{ overridebaseUrl }}:8084
+    uiSecurity:
+      ssl:
+        enabled: false
+      overrideBaseUrl: {{ overridebaseUrl }}:9000
+    authn:
+      oauth2:
+        enabled: {{ oauth2.enable }}
+    {% if oauth2.enable == "true" %}
+        client:
+          clientId: {{ oauth2.clientid}}
+          clientSecret: {{ oauth2.clientsecret}}
+          accessTokenUri: https://github.com/login/oauth/access_token
+          userAuthorizationUri: https://github.com/login/oauth/authorize
+          scope: user:email
+        resource:
+          userInfoUri: https://api.github.com/user
+        userInfoMapping:
+          email: email
+          firstName: ''
+          lastName: name
+          username: login
+        provider: GITHUB
+    {% endif %}
+      saml:
+        enabled: false
+        userAttributeMapping: {}
+      ldap:
+        enabled: false
+      x509:
+        enabled: false
+      iap:
+        enabled: false
+      enabled: {{ oauth2.enable }}
+    authz:
+      groupMembership:
+        service: {{ authz.roleprovidertype }}
+        google:
+          roleProviderType: GOOGLE
+        github:
+          roleProviderType: {{ authz.roleprovidertype }}
+          baseUrl: https://api.github.com
+          accessToken: {{ authz.accesstoken }}
+          organization: {{ authz.organization }}
+        file:
+          roleProviderType: FILE
+        ldap:
+          roleProviderType: LDAP
+      enabled: {{ authz.enable }}
+  artifacts:
+    bitbucket:
+      enabled: false
+      accounts: []
+    gcs:
+      enabled: false
+      accounts: []
+    oracle:
+      enabled: false
+      accounts: []
+    github:
+      enabled: false
+      accounts: []
+    gitlab:
+      enabled: false
+      accounts: []
+    gitrepo:
+      enabled: false
+      accounts: []
+    http:
+      enabled: false
+      accounts: []
+    helm:
+      enabled: false
+      accounts: []
+    s3:
+      enabled: {{ enable_s3_artifacts }}
+      accounts:
+      {% if enable_s3_artifacts == "true" %}
+      {% for items in s3_artifacts %}
+      - name: {{ s3_artifacts[items].name }}
+        {% if s3_artifacts[items].awsaccesskeyid and  s3_artifacts[items].awssecretaccesskey %}
+        awsAccessKeyId: {{ s3_artifacts[items].awsaccesskeyid }}
+        awsSecretAccessKey: {{ s3_artifacts[items].awssecretaccesskey }}
+        {% endif %}
+        region: {{ s3_artifacts[items].region }}
+      {% endfor %}
+      {% endif %}
+    maven:
+      enabled: false
+      accounts: []
+    templates: []
+  pubsub:
+    enabled: false
+    google:
+      enabled: false
+      pubsubType: GOOGLE
+      subscriptions: []
+      publishers: []
+  canary:
+    enabled: false
+    serviceIntegrations:
+    - name: google
+      enabled: false
+      accounts: []
+      gcsEnabled: false
+      stackdriverEnabled: false
+    - name: prometheus
+      enabled: false
+      accounts: []
+    - name: datadog
+      enabled: false
+      accounts: []
+    - name: signalfx
+      enabled: false
+      accounts: []
+    - name: aws
+      enabled: false
+      accounts: []
+      s3Enabled: false
+    - name: newrelic
+      enabled: false
+      accounts: []
+    reduxLoggerEnabled: true
+    defaultJudge: NetflixACAJudge-v1.0
+    stagesEnabled: true
+    templatesEnabled: true
+    showAllConfigsEnabled: true
+  plugins:
+    plugins: []
+    enabled: false
+    downloadingEnabled: false
+  spinnaker:
+    extensibility:
+      repositories: {}
+  webhook:
+    trust:
+      enabled: false
+  telemetry:
+    enabled: false
+    endpoint: https://stats.spinnaker.io
+    instanceId: 01DZRBHPKB6F5R32X0R7EG24A4
+    connectionTimeoutMillis: 3000
+    readTimeoutMillis: 5000

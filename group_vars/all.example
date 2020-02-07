@@ -1,53 +1,59 @@
-s3_bucket_name: "spinnaker_bucket"
-root_folder: "front50"
-region : "us-west-2"
-access_key: 
-secret_key: 
+s3_bucket_name: spinnaker-configs
+root_folder: front50
+access_key: xxx
+secret_key: xxxx
 enable_docker_reg: "true"
 docker_regs: 
     one:
-        provider: "aws"
-        name: "example"
-        address: "https://1233433434.dkr.ecr.us-east-1.amazonaws.com"
+        provider: aws
+        name: ecr-registry
+        address: https://xxxx.dkr.ecr.us-west-2.amazonaws.com
+        region: us-west-2
     two:
         provider: "docker"
         name: "docker-reg"
         address: "https://index.docker.io"
         username: "example"
         password: "p@ssw0rd"
-
-enable_kubernetes: true
+docker_primary_account: ecr-registry
+enable_kubernetes: "true"
 kubernetes:
     one:
-        name: example
-        providerVersion: "V2"
-        default_docker_reg: "example"
-        context: example
+        name: xxxxx
+        environment: dev,stage
+        providerVersion: V2
+        default_docker_reg: ecr-registry
+        context: xxxxx
         configureImagePullSecrets: "true"
+        omitnamespaces: ["kube-system"]
         kubeconfigFile: "/home/ubuntu/.kube/config"
-
+        onlyspinnakermanaged: "true"
+k8s_primary_account: xxxxx
 slack:
     enable: "true"
-    botname: example
-    token: asdf1234
+    botname: xxxx-bot
+    token: xoxb-3xxx
 prometheus:
     enable: "true"
+overridebaseUrl: "http://spinnaker.example.com"
 oauth2:
     enable: "true"
-    clientid: asdf
-    clientsecret: 1234
+    clientid: xxxx
+    clientsecret: xxxxx
 authz:
     enable: "true"
     roleprovidertype: GITHUB
-    accesstoken: asdf
-    organization: asdf1234
+    accesstoken: xxx
+    organization: xxxx
 enable_s3_artifacts: "true"
 s3_artifacts:
     one:
-        name: test1
-        awsaccesskeyid: asdf
-        awssecretaccesskey: asdf1234
-    two:
-        name: test2
-        awsaccesskeyid: asdfa
-        awssecretaccesskey: asdf1234aaa
+        name: helm-artifacts
+        awsaccesskeyid: xxx
+        awssecretaccesskey: xxxx
+        region: us-west-2
+    # two:
+    #     name: test2
+    #     awsaccesskeyid: asdfa
+    #     awssecretaccesskey: asdf1234aaa
+    #     region: us-west-2

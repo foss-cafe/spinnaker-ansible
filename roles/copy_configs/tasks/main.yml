@@ -1,0 +1,69 @@
+- name: Allow 'wheel' group to have passwordless sudo
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%ubuntu'
+    line: 'ubuntu ALL=(ALL) NOPASSWD: ALL'
+
+- name: Ansible check directory.
+  stat:
+    path: /home/ubuntu/.hal/default/service-settings
+  register: hal_service_settings
+ 
+- name: "echo if directory already existed"
+  debug:
+    msg: "the service-settings directory is already existed"
+  when: hal_service_settings.stat.exists
+- name: "Ansible Create directory if not exists"
+  file:
+    path: /home/ubuntu/.hal/default/service-settings
+    state: directory
+    mode: 0775
+    group: ubuntu
+    owner: ubuntu
+  when: hal_service_settings.stat.exists == false
+
+
+- name: Copy Deck config to Server
+  copy: 
+    src: deck.yml 
+    dest: /home/ubuntu/.hal/default/service-settings/deck.yml
+    owner: ubuntu
+    group: ubuntu
+
+- name: Ansible check directory.
+  stat:
+    path: /home/ubuntu/.kube
+  register: kube_config
+
+- name: "Ansible Create .kube directory if not exists"
+  file:
+    path: /home/ubuntu/.kube
+    state: directory
+    mode: 0775
+    group: ubuntu
+    owner: ubuntu
+  when: kube_config.stat.exists == false
+
+
+- name: Copy gate config to Server
+  copy: 
+    src: /Users/rajeev/.kube/config.aws 
+    dest: /home/ubuntu/.kube/config
+    owner: ubuntu
+    group: ubuntu
+
+- name: copy hal config file
+  template:
+    src: config.j2
+    dest: /home/ubuntu/.hal/config
+    lstrip_blocks: yes
+    owner: ubuntu
+    group: ubuntu
+
+- name: Copy kube config config to Server
+  copy: 
+    src: gate.yml 
+    dest: /home/ubuntu/.hal/default/service-settings/gate.yml
+    owner: ubuntu
+    group: ubuntu
