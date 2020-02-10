@@ -67,3 +67,4 @@
     dest: /home/ubuntu/.hal/default/service-settings/gate.yml
     owner: ubuntu
     group: ubuntu
+  notify: hal_deploy
