@@ -1,0 +1,7 @@
+{
+    "ami_region": "us-west-2",
+    "ami_instance_type": "t2.medium",
+    "ami_ssh_username": "ubuntu",
+    "ami_name": "spinnaker",
+    "ami_description": "Spinnaker HAL ami image"
+}

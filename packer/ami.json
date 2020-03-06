@@ -1,0 +1,53 @@
+{
+    "variables": {
+      "ami_region": "",
+      "ami_instance_type": "",
+      "ami_ssh_username": "",
+      "ami_name": "",
+      "ami_description": "",
+      "ami_users": ""
+    },
+    "builders": [{
+      "type": "amazon-ebs",
+      "region": "{{user `ami_region`}}",
+      "instance_type": "{{user `ami_instance_type`}}",
+      "ssh_username": "{{user `ami_ssh_username`}}",
+      "ami_description": "{{user `ami_description`}}",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04*",
+          "root-device-type": "ebs"
+        },
+        "owners": ["099720109477"],
+        "most_recent": true
+  
+      },
+  
+      "ami_name": "{{user `ami_name`}}-{{timestamp}}",
+      "tags": {
+        "Name": "{{user `ami_name`}}",
+        "OS_Version": "Ubuntu 18:04"
+      },
+      "run_tags": {
+        "Name": "{{ user `ami_name` }}",
+        "OS_Version": "Ubuntu 18:04",
+        "Runner": "Packer"
+      },
+      "run_volume_tags": {
+        "Name": "{{ user `ami_name` }}",
+        "Runner": "Packer",
+        "OS_Version": "Ubuntu 18:04"
+      },
+      "snapshot_tags": {
+        "Name": "{{user `ami_name`}}",
+        "OS_Version": "Ubuntu 18:04"
+      }
+    }],
+    "provisioners": [
+      {
+        "type": "ansible",
+        "playbook_file": "../install_hal.yml"
+      }
+    ]
+  }
