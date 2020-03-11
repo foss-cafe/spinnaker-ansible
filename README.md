@@ -30,10 +30,6 @@ ubuntu/xenial64 (virtualbox, 20191211.0.0)
 
 Start your VM
 
-```bash
-vagrant init
-```
-
 You can tune your VM configs by updating `Vagrantfile`.
 
 ### Install hal
